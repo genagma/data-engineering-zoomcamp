@@ -11,7 +11,11 @@
 **__pycache__/
 .history
 **/ny_taxi_postgres_data/*
+**/ny_taxi_postgre_data/*
 serving_dir
 *.csv
 .ipynb_checkpoints/
 !week_6_stream_processing/avro_example/data/rides.csv
+**/video/*
+**/audio/*
+**sld.txt

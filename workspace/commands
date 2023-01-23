@@ -1,0 +1,127 @@
+# Docker help
+docker --help
+
+# command to get help on the "docker build" command
+docker build --help # --iidfile string          Write the image ID to the file
+
+# Run docker with the python:3.9 image in an iterative mode
+docker run -it python:3.9
+
+# Run docker with the python:3.9 image in an iterative mode and the entrypoint of bash
+docker run -it --entrypoint=bash python:3.9
+# pip list
+# Package    Version
+# ---------- -------
+# pip        22.0.4
+# setuptools 58.1.0
+# wheel      0.38.4
+
+
+
+# Create a docker image through Dockerfile 
+# The point (.) indicate build the image into directory
+docker build -t taxi_ingest:v001 .
+
+# Run Postgres image with Docker
+docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxy" \
+    -v $(pwd)/ny_taxi_postgre_data:/var/lib/postgresql/data \
+    -p 5432:5432 \
+ postgres:13
+
+# Connect to Postgres Database with command line utility pgcli
+pgcli -h localhost -p 5432 -u root -d ny_taxy
+
+CREATE TABLE "yellow_taxi_data" (
+"VendorID" REAL,
+  "tpep_pickup_datetime" TIMESTAMP,
+  "tpep_dropoff_datetime" TIMESTAMP,
+  "passenger_count" REAL,
+  "trip_distance" REAL,
+  "RatecodeID" REAL,
+  "store_and_fwd_flag" TEXT,
+  "PULocationID" INTEGER,
+  "DOLocationID" INTEGER,
+  "payment_type" REAL,
+  "fare_amount" REAL,
+  "extra" REAL,
+  "mta_tax" REAL,
+  "tip_amount" REAL,
+  "tolls_amount" REAL,
+  "improvement_surcharge" REAL,
+  "total_amount" REAL,
+  "congestion_surcharge" REAL
+)
+
+
+# Run PgAdmin image with Docker
+docker run -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -p 8080:80 \
+ dpage/pgadmin4
+
+# Create a network to communicate two containers
+ docker network create pg-network
+
+ docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxy" \
+    -v $(pwd)/ny_taxi_postgre_data:/var/lib/postgresql/data \
+    -p 5432:5432 \
+    --network=pg-network \
+    --name pg-database \
+  postgres:13
+
+docker run -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -p 8080:80 \
+    --network=pg-network \
+    --name pgadmin \
+  dpage/pgadmin4
+
+# Start the container already created
+docker start CONTAINER_ID
+
+# Stop container
+docker stop CONTAINER_ID
+
+ # Convert Jupyter notebook to Python script
+ jupyter nbconvert --to=script upload-data.ipynb
+
+ # Execute Python script
+python ingest_data.py \
+  --user=root \
+  --password=root \
+  --host=localhost \
+  --port=5432 \
+  --db=ny_taxy \
+  --table_name=yellow_taxi_data \
+  --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+
+# Read csv.gz file with Pandas
+df = pd.read_csv('sample.tar.gz', compression='gzip', header=0, sep=',', quotechar='"', on_bad_lines='skip')
+
+# Run Docker image that execute Python script
+docker run -it \
+  --network=pg-network \
+  taxi_ingest:v001 \
+    --user=root \
+    --password=root \
+    --host=pg-database \
+    --port=5432 \
+    --db=ny_taxy \
+    --table_name=yellow_taxi_data \
+    --url=https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz
+
+# Run docker-compose with various services using yaml file
+docker compose up
+docker compose up -d #deatached mode permit use the console
+
+# Stop docker-compose with various services
+docker compose down
+
