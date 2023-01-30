@@ -134,3 +134,13 @@ ssh-add ~/.ssh/id_key
 # Change your remote's URL from HTTPS to SSH
 git remote set-url origin git@github.com:genagma/data-engineering-zoomcamp.git
 
+# Start Prefect server UI
+prefect orion start
+
+# List backgroud process
+jobs
+
+# bring background process to foreground fg %numbre_process
+fg %1
+
+
