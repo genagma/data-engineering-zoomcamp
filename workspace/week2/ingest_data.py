@@ -3,35 +3,25 @@
 
 import argparse
 import os
-
 from time import time
-
 import pandas as pd
 from sqlalchemy import create_engine
 
-def main(params):
+def ingest_data(user, password, host, port, db,table_name, url):
 
-    user = params.user
-    password = params.password
-    host = params.host
-    port = params.port
-    db = params.db
-    table_name = params.table_name
-    url = params.url
-    csv_name = 'output.csv.gz'
+    # The backup files are gzipped,and it's importan to keep the correct extension
+    # for pandas to be able to open file
+    if url.endswith('.csv.gz'):
+        csv_name='yellow_tripdata_2021-01.csv.gz'
+    else:
+        csv_name = 'output.csv'
     
     # Download the csv
     os.system(f'wget {url} -O {csv_name}')
+    postgres_url = f'postgresql://{user}:{password}@{host}:{port}/{db}'
+    engine = create_engine(postgres_url)
 
-
-    engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
-
-    df = pd.read_csv(csv_name, compression='gzip', header=0, sep=',', quotechar='"', on_bad_lines='skip', nrows=100)
-
-    df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-    df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
-
-    df_iter = pd.read_csv(csv_name, compression='gzip', header=0, sep=',', quotechar='"', on_bad_lines='skip', iterator=True, chunksize=100000)
+    df_iter = pd.read_csv(csv_name, iterator=True, chunksize=100000)
 
     df = next(df_iter)
 
@@ -43,42 +33,33 @@ def main(params):
     df.to_sql(name=table_name, con=engine, if_exists='append')
 
 
-
     while True:
-        t_start = time()
+        try :
+            t_start = time()
         
-        df = next(df_iter)
+            df = next(df_iter)
+               
+            df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
+            df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
         
-        df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-        df = next(df_iter)
+            df.to_sql(name=table_name, con=engine, if_exists='append')
         
-        df.tpep_pickup_datetime = pd.to_datetime(df.tpep_pickup_datetime)
-        df.tpep_dropoff_datetime = pd.to_datetime(df.tpep_dropoff_datetime)
+            t_end = time()
         
-        df.to_sql(name=table_name, con=engine, if_exists='append')
-        
-        t_end = time()
-        
-        print('inserted another chunk..., took %.3f second' % (t_end - t_start))
+            print('inserted another chunk..., took %.3f second' % (t_end - t_start))
+        except StopIteration:
+            print('Finished ingesting data into the postgres database.')
+            break
 
-    
-    
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Ingest CSV data to Postgres')
-
-    # user, password, host, port, database name, table name
-    # url of the csv
-
-    parser.add_argument('--user', help='user name for postgres')
-    parser.add_argument('--password', help='password for postgres')
-    parser.add_argument('--host', help='host for postgres')
-    parser.add_argument('--port', help='port for postgres')
-    parser.add_argument('--db', help='database name for postgres')
-    parser.add_argument('--table_name', help='name of the table where we will wrte the results to')
-    parser.add_argument('--url', help='url of the csv file')
-
-    args = parser.parse_args()
-
-    main(args)
+    user = 'root'
+    password = 'root'
+    host = 'localhost'
+    port = '5432'
+    db = 'ny_taxy'
+    table_name = 'yellow_taxi_trips'
+    csv_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz'
+    
+    ingest_data(user, password, host, port, db,table_name, csv_url)
