@@ -143,4 +143,5 @@ jobs
 # bring background process to foreground fg %numbre_process
 fg %1
 
-
+# register blocks for GCP in  prefect
+prefect block register -m prefect_gcp
