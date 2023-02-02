@@ -140,8 +140,15 @@ prefect orion start
 # List backgroud process
 jobs
 
-# bring background process to foreground fg %numbre_process
-fg %1
-
+# bring background process to foreground fg %numba
 # register blocks for GCP in  prefect
 prefect block register -m prefect_gcp
+
+# query the system clock
+timedatectl
+
+# Edit crontab file
+crontab -e
+
+# List all tasks in the crontab
+crontab -l
