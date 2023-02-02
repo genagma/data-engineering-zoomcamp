@@ -15,6 +15,8 @@
 **/ny_taxi_postgresql_data/*
 serving_dir
 *.csv
+*.csv.gz
+*.parquet
 .ipynb_checkpoints/
 !week_6_stream_processing/avro_example/data/rides.csv
 workspace/week2/yellow_tripdata_2021-01.csv.gz
