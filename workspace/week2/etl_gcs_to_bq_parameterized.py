@@ -27,21 +27,28 @@ def write_bq(df: pd.DataFrame) -> None:
     )
 
 @flow(log_prints=True)
-def el_gcs_to_bq(months: list, year: int, color: str):
+def el_gcs_to_bq(year: int, month: int, color: str) -> int:
     """Main ETL flow to load data into Big Query"""
+    
+    path = extract_from_gcs(color, year, month)
+    df = pd.read_parquet(path)
+    
+    write_bq(df)
+    return len(df)
 
+@flow(log_prints=True)
+def el_parent_flow(
+    months: list[int] = [2, 3], year: int = 2019, color: str = "yellow"
+):
     total_rows = 0
 
     for month in months:
-        path = extract_from_gcs(color, year, month)
-        df = pd.read_parquet(path)
-        total_rows += len(df)
-        write_bq(df)
-
+        total_rows += el_gcs_to_bq(year, month, color)
+    
     print(f"Total number of rows: {total_rows}")
 
 if __name__==  "__main__":
     months = [2, 3]
     year = 2019
     color = "yellow"
-    el_gcs_to_bq(months, year, color)
+    el_parent_flow(months, year, color)

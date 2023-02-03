@@ -1,0 +1,56 @@
+###
+### A complete description of a Prefect Deployment for flow 'el-parent-flow'
+###
+name: Parameterized ETL to BigQuery
+description: "Extract from GCS and load into Big Query"
+version: cc44d9bb42ad02766b7e2712d3b3c53e
+# The work queue that will handle this deployment's runs
+work_queue_name: default
+tags: []
+parameters: {"color": "yellow", "months": [2, 3], "year": 2019}
+schedule: null
+infra_overrides: {}
+infrastructure:
+  type: process
+  env: {}
+  labels: {}
+  name: null
+  command: null
+  stream_output: true
+  working_dir: null
+  block_type_slug: process
+  _block_type_slug: process
+
+###
+### DO NOT EDIT BELOW THIS LINE
+###
+flow_name: el-parent-flow
+manifest_path: null
+storage: null
+path: /mnt/DSCRGS/data-engineering-zoomcamp/workspace/week2
+entrypoint: etl_gcs_to_bq_parameterized.py:el_parent_flow
+parameter_openapi_schema:
+  title: Parameters
+  type: object
+  properties:
+    months:
+      title: months
+      default:
+      - 2
+      - 3
+      position: 0
+      type: array
+      items:
+        type: integer
+    year:
+      title: year
+      default: 2019
+      position: 1
+      type: integer
+    color:
+      title: color
+      default: yellow
+      position: 2
+      type: string
+  required: null
+  definitions: null

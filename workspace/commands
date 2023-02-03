@@ -152,3 +152,12 @@ crontab -e
 
 # List all tasks in the crontab
 crontab -l
+
+# deployment with prefect - define
+prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parameterized ETL"
+
+# deployment with prefect - load, create
+prefect deployment apply etl_parent_flow-deployment.yaml
+
+# deployment with prefect - run
+prefect agent start  --work-queue "default"
