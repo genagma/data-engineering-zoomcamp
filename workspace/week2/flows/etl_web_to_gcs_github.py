@@ -38,7 +38,7 @@ def write_gcs(path: Path) -> None:
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """rite Dataframe out locally as parquet file"""
-    path = Path(f"../data/{color}/{dataset_file}.parquet")
+    path = Path(f"../../data/{color}/{dataset_file}.parquet")
     df.to_parquet(path, compression="gzip")
     return path
 
