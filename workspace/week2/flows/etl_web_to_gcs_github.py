@@ -38,7 +38,7 @@ def write_gcs(path: Path) -> None:
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """write Dataframe out locally as parquet file"""
-    absolute_path = os.path.dirname(__file__)
+    absolute_path = os.path.dirname(os.path.realpath('__file__'))
     relative_path = f"data/{color}"
     full_path = os.path.join(absolute_path, relative_path)
 
