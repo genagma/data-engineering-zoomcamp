@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
-from random import randint
+import os
 
 @task(retries=3)
 def fetch(dataset_url: str) -> pd.DataFrame:
@@ -37,8 +37,12 @@ def write_gcs(path: Path) -> None:
 
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
-    """rite Dataframe out locally as parquet file"""
-    path = Path(f"../../data/{color}/{dataset_file}.parquet")
+    """write Dataframe out locally as parquet file"""
+    absolute_path = os.path.dirname(__file__)
+    relative_path = "data/{color}"
+    full_path = os.path.join(absolute_path, relative_path)
+
+    path = Path(f"{full_path}/{dataset_file}.parquet")
     df.to_parquet(path, compression="gzip")
     return path
 
