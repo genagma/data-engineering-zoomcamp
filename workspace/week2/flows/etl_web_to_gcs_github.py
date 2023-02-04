@@ -40,7 +40,7 @@ def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """write Dataframe out locally as parquet file"""
     absolute_path = os.path.dirname(__file__)
     print(absolute_path)
-    relative_path = f"data/{color}"
+    relative_path = f"../data/{color}"
     print(relative_path)
     full_path = os.path.join(absolute_path, relative_path)
     print(full_path)
