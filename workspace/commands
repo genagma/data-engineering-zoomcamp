@@ -22,6 +22,14 @@ docker run -it --entrypoint=bash python:3.9
 # The point (.) indicate build the image into directory
 docker build -t taxi_ingest:v001 .
 
+docker image build -t dockerid/prefect:dez .
+
+# Docker login to Docker hub registry
+docker login -u dockerid
+
+# Push image to Docker hub
+docker image push dockerid/prefect:dez
+
 # Run Postgres image with Docker
 docker run -it \
     -e POSTGRES_USER="root" \
@@ -71,7 +79,7 @@ docker run -it \
     -e POSTGRES_PASSWORD="root" \
     -e POSTGRES_DB="ny_taxy" \
     -v $(pwd)/ny_taxi_postgre_data:/var/lib/postgresql/data \
-    -p 5432:5432 \
+    -p 5432:5432 \antaresgen
     --network=pg-network \
     --name pg-database \
   postgres:13
@@ -159,5 +167,25 @@ prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parameteriz
 # deployment with prefect - load, create
 prefect deployment apply etl_parent_flow-deployment.yaml
 
-# deployment with prefect - run
+# deployment with prefect - start agent to run flows
 prefect agent start  --work-queue "default"
+prefect agent start  -q default
+
+# deployment with prefect - run a flow
+prefect deployment run etl-parent-flow/docker-flow
+
+# deployment with prefect - define with schedule (-a means appy too)
+prefect deployment build ./parameterized_flow.py:etl_parent_flow -n "Parameterized ETL with schedule" --cron "0 0 * * *" -a
+
+# deployment with prefect - Get information
+prefect deployment build --help
+
+# get the profile used
+prefect profile ls
+
+
+# view settings from the cli
+prefect config view
+
+# using a local Prefect Orion API server instance.
+prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"

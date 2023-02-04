@@ -2,10 +2,9 @@ from pathlib import Path
 import pandas as pd
 from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
-from prefect.tasks import task_input_hash
-from datetime import timedelta
+from random import randint
 
-@task(retries=3, cache_key_fn=task_input_hash, cache_expiration=timedelta(days=1))
+@task(retries=3)
 def fetch(dataset_url: str) -> pd.DataFrame:
     """Read taxi data from web into pandas DataFrame"""
 
@@ -39,14 +38,16 @@ def write_gcs(path: Path) -> None:
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """rite Dataframe out locally as parquet file"""
-    path = Path(f"data/{color}/{dataset_file}.parquet")
+    path = Path(f"../data/{color}/{dataset_file}.parquet")
     df.to_parquet(path, compression="gzip")
     return path
 
 @flow()
-def etl_web_to_gcs(year: int, month: int, color: str) -> None:
+def etl_web_to_gcs_github() -> None:
     """The main ETL function"""
-    
+    color = "green"
+    year = 2020
+    month = 11
     dataset_file = f"{color}_tripdata_{year}-{month:02}"
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
     
@@ -55,16 +56,5 @@ def etl_web_to_gcs(year: int, month: int, color: str) -> None:
     path = write_local(df_clean, color, dataset_file)
     write_gcs(path)
 
-@flow()
-def etl_parent_flow(
-    months: list[int] = [1, 2], year: int  = 2021, color: str = "yelow"
-):
-
-    for month in months:
-        etl_web_to_gcs(year, month, color)
-
 if __name__ == '__main__':
-    color = "yellow"
-    months = [1,2,3]
-    year = 2021
-    etl_parent_flow(months, year, color)
+    etl_web_to_gcs_github()
