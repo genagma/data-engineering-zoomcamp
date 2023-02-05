@@ -39,16 +39,19 @@ def write_gcs(path: Path) -> None:
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """write Dataframe out locally as parquet file"""
 
-    absolute_path = os.path.dirname(__file__)
-    print(f'absolute_path: {absolute_path}')
-    parent_path = Path(absolute_path).parent
-    print(f'parent_path: {parent_path}')
-    relative_path = "data"
-    print(f'relative_path: {relative_path}')
-    full_path = os.path.join(parent_path, relative_path)
-    print(f'full_path: {full_path}')
-    path = Path(f"{full_path}/{color}/{dataset_file}.parquet")
-    print(f"path: {path}")
+    # absolute_path = os.path.dirname(__file__)
+    # print(f'absolute_path: {absolute_path}')
+    # parent_path = Path(absolute_path).parent
+    # print(f'parent_path: {parent_path}')
+    # relative_path = "data"
+    # print(f'relative_path: {relative_path}')
+    # full_path = os.path.join(parent_path, relative_path)
+    # print(f'full_path: {full_path}')
+    # path = Path(f"{full_path}/{color}/{dataset_file}.parquet")
+    # print(f"path: {path}")
+    
+    df.to_parquet(path, compression="gzip")
+    path = Path(f"data/{color}/{dataset_file}.parquet")
     df.to_parquet(path, compression="gzip")
     return path
 
