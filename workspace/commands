@@ -134,7 +134,7 @@ docker compose up -d #deatached mode permit use the console
 docker compose down
 
 # Generate ssh keys for github
-ssh-keygen -t ed25519 -C "anta@gmail.com"
+ssh-keygen -t ed25519 -C "anta@com"
 
 # Add keys to SSH agent
 ssh-add ~/.ssh/id_key
@@ -189,3 +189,11 @@ prefect config view
 
 # using a local Prefect Orion API server instance.
 prefect config set PREFECT_API_URL="http://127.0.0.1:4200/api"
+
+# Prefect cloud
+# install prefect and login in your terminal
+pip install -U prefect
+prefect cloud login
+
+# use Prefect Cloud
+prefect config set PREFECT_API_URL="https://api.prefect.cloud/api/accounts/[ACCOUNT-ID]/workspaces/[WORKSPACE-ID]"
