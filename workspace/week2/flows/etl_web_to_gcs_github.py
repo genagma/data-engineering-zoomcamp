@@ -29,9 +29,9 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 @task()
-def write_gcs(path: Path) -> None:
+def write_gcs(path: Path, dataset_file: str) -> None:
     """Uploading local parquet file to GCS"""
-    gcs_path="data/green"
+    gcs_path=f"data/green/{dataset_file}.parquet"
     gcs_block = GcsBucket.load("dez-gcs")
     gcs_block.upload_from_path(from_path=f"{path}", to_path=gcs_path)
     return
@@ -40,17 +40,6 @@ def write_gcs(path: Path) -> None:
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """write Dataframe out locally as parquet file"""
 
-    # absolute_path = os.path.dirname(__file__)
-    # print(f'absolute_path: {absolute_path}')
-    # parent_path = Path(absolute_path).parent
-    # print(f'parent_path: {parent_path}')
-    # relative_path = "data"
-    # print(f'relative_path: {relative_path}')
-    # full_path = os.path.join(parent_path, relative_path)
-    # print(f'full_path: {full_path}')
-    # path = Path(f"{full_path}/{color}/{dataset_file}.parquet")
-    # print(f"path: {path}")
-    # df.to_parquet(path, compression="gzip")
     absolute_path = "/mnt/DSCRGS/data-engineering-zoomcamp/workspace/week2/data/green"
     
     path = Path(f"{absolute_path}/{dataset_file}.parquet")
@@ -70,7 +59,7 @@ def etl_web_to_gcs_github() -> None:
     df = fetch(dataset_url)
     df_clean = clean(df)
     path = write_local(df_clean, color, dataset_file)
-    write_gcs(path)
+    write_gcs(path, dataset_file)
 
 if __name__ == '__main__':
     etl_web_to_gcs_github()
