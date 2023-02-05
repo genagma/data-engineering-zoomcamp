@@ -169,7 +169,7 @@ prefect deployment apply etl_parent_flow-deployment.yaml
 
 # deployment with prefect - start agent to run flows
 prefect agent start  --work-queue "default"
-prefect agent start  -q default
+prefect agent start -q default
 
 # deployment with prefect - run a flow
 prefect deployment run etl-parent-flow/docker-flow
