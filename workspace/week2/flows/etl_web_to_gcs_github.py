@@ -49,9 +49,9 @@ def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     # print(f'full_path: {full_path}')
     # path = Path(f"{full_path}/{color}/{dataset_file}.parquet")
     # print(f"path: {path}")
+    # df.to_parquet(path, compression="gzip")
     
-    df.to_parquet(path, compression="gzip")
-    path = Path(f"data/{color}/{dataset_file}.parquet")
+    gipath = Path(f"data/{color}/{dataset_file}.parquet")
     df.to_parquet(path, compression="gzip")
     return path
 
