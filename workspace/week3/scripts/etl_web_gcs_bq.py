@@ -174,7 +174,7 @@ def web_to_gcs(month, year, service):
 def etl_parent_flow(month: str, year: int, service: str):
     web_to_gcs(month, year, service)
 
-if __name__==  "__main__":
+if __name__ == "__main__":
     month = '01'
     year = 2019
     service = "fhv"
