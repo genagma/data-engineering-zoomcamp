@@ -149,6 +149,7 @@ prefect orion start
 jobs
 
 # bring background process to foreground fg %numba
+
 # register blocks for GCP in  prefect
 prefect block register -m prefect_gcp
 
@@ -197,3 +198,34 @@ prefect cloud login
 
 # use Prefect Cloud
 prefect config set PREFECT_API_URL="https://api.prefect.cloud/api/accounts/[ACCOUNT-ID]/workspaces/[WORKSPACE-ID]"
+
+# Big Query Machine Learning Deployment
+
+# Login to GCP
+gcloud auth login
+
+# Export the model to the GCS
+bq --project_id dez-20230113 extract -m nytaxi.tip_model gs://dez_data_lake_dez-20230113/tip_model
+
+# Create a temoral directory to copy the model from GCS to Local file system
+mkdir /tmp/model
+
+# Copy model from GCS to Local file system
+gsutil cp -r gs://dez_data_lake_dez-20230113/tip_model /tmp/model
+
+# Create directory to serve the model
+mkdir -p ../model/serving_dir/tip_model/1
+
+# Copy model to serving directory
+cp -r /tmp/model/tip_model/* ../model/serving_dir/tip_model/1
+
+# Download Docker image to deploy machine learning model
+docker pull tensorflow/serving
+
+# Run container image to deploy model
+docker run -p 8501:8501 --mount type=bind,source=`pwd`/../model/serving_dir/tip_model,target=/models/tip_model -e MODEL_NAME=tip_model -t tensorflow/serving &
+
+# Test the model
+curl -d '{"instances": [{"passenger_count":1, "trip_distance":12.2, "PULocationID":"193", "DOLocationID":"264", "payment_type":"2","fare_amount":20.4,"tolls_amount":0.0}]}' -X POST http://localhost:8501/v1/models/tip_model:predict
+
+http://localhost:8501/v1/models/tip_model

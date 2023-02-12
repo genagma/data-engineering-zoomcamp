@@ -1,6 +1,5 @@
 import io
 import os
-import requests
 import pandas as pd
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
@@ -17,10 +16,13 @@ Pre-reqs:
 """
 
 # services = ['fhv','green','yellow']
-init_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/'
+init_url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download'
+
 # switch out the bucketname
 BUCKET = os.environ.get("GCP_GCS_BUCKET", "dez_data_lake_dez-20230113")
 
+# Relative data directory path
+relative_data_directory = '../../data'
 
 table_schema_green = pa.schema(
     [
@@ -70,11 +72,40 @@ table_schema_yellow = pa.schema(
 
 )
 
-def format_to_parquet(src_file, service):
+table_schema_fhv_2019 = pa.schema(
+   [
+        ('dispatching_base_num', pa.string()), 
+        ('pickup_datetime', pa.timestamp('s')), 
+        ('dropOff_datetime', pa.timestamp('s')), 
+        ('PUlocationID', pa.int64()), 
+        ('DOlocationID', pa.int64()), 
+        ('SR_Flag', pa.int64()), 
+        ('Affiliated_base_number', pa.string())]
+
+)
+
+table_schema_fhv_2020 = pa.schema(
+   [
+        ('dispatching_base_num', pa.string()), 
+        ('pickup_datetime', pa.timestamp('s')), 
+        ('dropoff_datetime', pa.timestamp('s')), 
+        ('PUlocationID', pa.int64()), 
+        ('DOlocationID', pa.int64()), 
+        ('SR_Flag', pa.int64()), 
+        ('Affiliated_base_number', pa.string())]
+
+)
+
+def format_to_parquet(src_file, service, year):
     if not src_file.endswith('.csv.gz'):
         logging.error("Can only accept source files in CSV format, for the moment")
         return
-    table = pv.read_csv(src_file)
+    
+    parse_options = pv.ParseOptions(delimiter=',', invalid_row_handler=skip_comment, ignore_empty_lines=True)
+    read_options = pv.ReadOptions(encoding='latin1')
+    convert_options = pv.ConvertOptions(strings_can_be_null=True)
+    print(src_file)
+    table = pv.read_csv(src_file, parse_options=parse_options, read_options=read_options, convert_options=convert_options)
 
     if service == 'yellow':
         table = table.cast(table_schema_yellow)
@@ -82,7 +113,13 @@ def format_to_parquet(src_file, service):
     elif service == 'green':
         table = table.cast(table_schema_green)
 
-    pq.write_table(table, src_file.replace('.csv.gz', '.parquet'))
+    elif service == 'fhv' and year == 2019:
+        table = table.cast(table_schema_fhv_2019)
+    
+    elif service == 'fhv' and year == 2020:
+        table = table.cast(table_schema_fhv_2020)
+
+    pq.write_table(table, src_file.replace('.csv.gz', '.parquet'), compression='gzip')
 
 def upload_to_gcs(bucket, object_name, local_file):
     """
@@ -98,6 +135,11 @@ def upload_to_gcs(bucket, object_name, local_file):
     blob = bucket.blob(object_name)
     blob.upload_from_filename(local_file)
 
+def skip_comment(row):
+    if row.text.startswith("# "):
+        return 'skip'
+    else:
+        return 'error'
 
 def web_to_gcs(year, service):
     for i in range(12):
@@ -109,24 +151,30 @@ def web_to_gcs(year, service):
         # csv file_name 
         file_name = service + '_tripdata_' + year + '-' + month + '.csv.gz'
 
+        init_url_service = f'{init_url}/{service}/'
+
         # download it using requests via a pandas df
-        print(init_url + file_name)
-        request_url = init_url + file_name
-        #wget.download(request_url, file_name)
+        print(init_url_service + file_name)
+        request_url = init_url_service + file_name
+        output_file = f"{relative_data_directory}/{file_name}"
+        print(output_file)
+        # Download the csv
+        #os.system(f'wget {request_url} -O {output_file}')
+        #wget.download(request_url, output_file)
 
         # read it back into a parquet file
-        ##df = pd.read_csv(file_name)
-        ######parquetized = format_to_parquet(file_name, service)
-        file_name = file_name.replace('.csv.gz', '.parquet')
-        #df.to_parquet(file_name, compression="gzip")
-        #print(f"Parquet: {file_name}")
+        #df = pd.read_csv(output_file, low_memory=False, encoding='latin1')
+        #print(df.head())
+        #parquetized = format_to_parquet(output_file, service, year)
 
         # upload it to gcs 
-        #upload_to_gcs(BUCKET, f"data/{service}/{file_name}", file_name)
+        upload_to_gcs(BUCKET, f"data/{service}/{file_name}", output_file) #file_name)
         print(f"GCS: data/{service}/{file_name}")
 
 
-web_to_gcs('2019', 'green')
-web_to_gcs('2020', 'green')
-web_to_gcs('2019', 'yellow')
-web_to_gcs('2020', 'yellow')
+#web_to_gcs('2019', 'green')
+#web_to_gcs('2020', 'green')
+#web_to_gcs('2019', 'yellow')
+#web_to_gcs('2020', 'yellow')
+web_to_gcs('2019', 'fhv')
+#web_to_gcs('2020', 'fhv')
