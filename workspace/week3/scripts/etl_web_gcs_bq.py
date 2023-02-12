@@ -107,7 +107,7 @@ def create_external_table(service, file_name):
     table = client.create_table(table)  # API request
 
     # Example query to find states starting with 'W'
-    sql = 'SELECT COUNT(1) FROM `{}.{}`'.format(dataset_id, table_id)
+    sql = 'SELECT COUNT(1) as count FROM `{}.{}`'.format(dataset_id, table_id)
 
     query_job = client.query(sql)  # API request
 
