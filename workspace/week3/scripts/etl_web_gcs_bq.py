@@ -27,6 +27,10 @@ BUCKET = os.environ.get("GCP_GCS_BUCKET", "dez_data_lake_dez-20230113")
 # Relative data directory path
 relative_data_directory = '../../data'
 
+# Absolute data directory path
+absolute_path_data_directory = "/mnt/DSCRGS/data-engineering-zoomcamp/workspace/data"
+    
+
 table_schema_fhv_2019 = pa.schema(
    [
         ('dispatching_base_num', pa.string()), 
@@ -149,7 +153,7 @@ def web_to_gcs(month, year, service):
     # download it using requests via a pandas df
     print(init_url_service + file_name)
     request_url = init_url_service + file_name
-    output_file = f"{relative_data_directory}/{file_name}"
+    output_file = f"{absolute_path_data_directory}/{file_name}"
     print(output_file)
     
     # Download the csv
