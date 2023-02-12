@@ -153,20 +153,20 @@ def web_to_gcs(month, year, service):
     print(output_file)
     
     # Download the csv
-    #wget.download(request_url, output_file)
+    wget.download(request_url, output_file)
 
     # read it back into a parquet file
-    #parquetized = format_to_parquet(output_file, service, year)
+    parquetized = format_to_parquet(output_file, service, year)
 
     # upload it to gcs 
     print(f"GCS: data/{service}/{file_name}")
-    #upload_to_gcs(BUCKET, f"data/{service}/{file_name}", output_file)
+    upload_to_gcs(BUCKET, f"data/{service}/{file_name}", output_file)
 
     # Create a external table
-    #create_external_table(service, file_name)
+    create_external_table(service, file_name)
 
     # Create a external table
-    #create_big_query_table()
+    create_big_query_table()
 
 
 
