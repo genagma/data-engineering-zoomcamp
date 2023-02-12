@@ -142,7 +142,7 @@ def skip_comment(row):
 def web_to_gcs(month, year, service):
 
     # csv file_name 
-    file_name = service + '_tripdata_' + year + '-' + month + '.csv.gz'
+    file_name = service + '_tripdata_' + str(year) + '-' + month + '.csv.gz'
 
     init_url_service = f'{init_url}/{service}/'
 
