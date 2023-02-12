@@ -8,7 +8,7 @@ deployment_github_storage = Deployment.build_from_flow(
     flow=etl_parent_flow,
     name="big-query-flow",
     storage=github_storage,
-    entrypoint="workspace/week3/scripts/etl_web_gcs_bq.py:el_parent_flow",
+    entrypoint="workspace/week3/scripts/etl_web_gcs_bq.py:etl_parent_flow",
 )
 
 deployment_github_storage.apply()
