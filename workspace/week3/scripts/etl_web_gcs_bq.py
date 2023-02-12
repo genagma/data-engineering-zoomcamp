@@ -171,11 +171,11 @@ def web_to_gcs(month, year, service):
 
 
 @flow(log_prints=True)
-def el_parent_flow(month: str, year: int, service: str):
+def etl_parent_flow(month: str, year: int, service: str):
     web_to_gcs(month, year, service)
 
 if __name__==  "__main__":
     month = '01'
     year = 2019
     service = "fhv"
-    el_parent_flow(month, year, service)
+    etl_parent_flow(month, year, service)
