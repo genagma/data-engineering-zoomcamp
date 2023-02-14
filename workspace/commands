@@ -1,3 +1,9 @@
+# Conda create environment with yaml file
+conda env create -f environment.yml
+
+# Conda remove environment
+conda env remove --name myenv
+
 # Docker help
 docker --help
 
