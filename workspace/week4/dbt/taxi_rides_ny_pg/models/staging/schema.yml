@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: staging
+    database: ny_taxy
+    schema: public
+    tables:
+      - name: green_taxi_data
+      - name: yellow_taxi_data
