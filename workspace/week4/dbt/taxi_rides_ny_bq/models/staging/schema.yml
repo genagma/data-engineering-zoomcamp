@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: staging
+    database: dez-20230113
+    schema: nytaxi
+
+    tables:
+      - name: green_tripdata_partitoned_clustered
+      - name: yellow_tripdata_partitoned_clustered
