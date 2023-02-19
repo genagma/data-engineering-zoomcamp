@@ -244,3 +244,17 @@ dbt init
 # test database connection
 dbt debug
 
+# create table/view from seeds
+dbt seed
+
+# create all models
+dbt run
+
+# creat all models, seeds and execute test
+dbt build
+
+# create all dependencies's model
+dbt build --select +model.sql
+
+# run all test defined in the schema.yml file
+dbt test
