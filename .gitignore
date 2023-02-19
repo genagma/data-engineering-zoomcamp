@@ -23,3 +23,4 @@ serving_dir
 **/video/*
 **/audio/*
 **sld.txt
+.vscode
