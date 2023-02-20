@@ -258,3 +258,8 @@ dbt build --select +model.sql
 
 # run all test defined in the schema.yml file
 dbt test
+
+# Build model passing a variable
+dbt build --select stg_green_tripdata.sql --var 'is_test_run: false'
+dbt build --select stg_yellow_tripdata.sql --var 'is_test_run: false'
+
