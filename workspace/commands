@@ -23,7 +23,6 @@ docker run -it --entrypoint=bash python:3.9
 # wheel      0.38.4
 
 
-
 # Create a docker image through Dockerfile 
 # The point (.) indicate build the image into directory
 docker build -t taxi_ingest:v001 .
@@ -258,3 +257,7 @@ dbt build --select +model.sql
 
 # run all test defined in the schema.yml file
 dbt test
+# Build model passing a variable
+dbt build --select stg_green_tripdata.sql --var 'is_test_run: false'
+dbt build --select stg_yellow_tripdata.sql --var 'is_test_run: false'
+
