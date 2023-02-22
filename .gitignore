@@ -25,3 +25,4 @@ serving_dir
 **sld.txt
 .vscode
 !workspace/week4/dbt/taxi_rides_ny_bq/seeds/taxi_zone_lookup.csv
+workspace/week4/metabase
