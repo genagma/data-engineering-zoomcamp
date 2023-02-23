@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: staging
+    database: dez-20230113
+    schema: nytaxi
+
+    tables:
+      - name: fhv_tripdata_non_partitioned_clustered
